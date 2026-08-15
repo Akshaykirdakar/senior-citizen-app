@@ -1,0 +1,5 @@
+Place these two Devanagari font files here (only needed for PDF export):
+  NotoSansDevanagari-Regular.ttf
+  NotoSansDevanagari-Bold.ttf
+Download from: https://fonts.google.com/noto/specimen/Noto+Sans+Devanagari
+The GitHub Actions "Build APK" workflow downloads them automatically.

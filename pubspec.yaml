@@ -1,0 +1,28 @@
+name: senior_sangh
+description: "माळशिरस तालुका ज्येष्ठ नागरिक संघ, अकलूज — सभासद नोंदणी अ‍ॅप"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  path_provider: ^2.1.1
+  image_picker: ^1.0.7
+  pdf: ^3.10.7
+  printing: ^5.12.0
+  intl: ^0.19.0
+  share_plus: ^7.2.1
+
+dev_dependencies:
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/fonts/
