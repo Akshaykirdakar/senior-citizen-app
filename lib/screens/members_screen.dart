@@ -25,7 +25,7 @@ class _MembersScreenState extends State<MembersScreen> {
       if (_filter == 'social' && !m.social) return false;
       if (_q.isEmpty) return true;
       final s = _q.toLowerCase();
-      return (m.name + m.memberNo + m.mobile).toLowerCase().contains(s);
+      return (m.name + m.memberNo + m.mobile + m.village).toLowerCase().contains(s);
     }).toList();
 
     final chips = [
@@ -159,6 +159,14 @@ class _MembersScreenState extends State<MembersScreen> {
                   child: Text(m.genderLabel,
                       style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: tint)),
                 ),
+              ]),
+              const SizedBox(height: 2),
+              Row(children: [
+                const Icon(Icons.location_on, size: 12, color: AppColors.green),
+                Text(' ${m.village.isEmpty ? "—" : m.village}', style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+                const SizedBox(width: 8),
+                const Icon(Icons.phone, size: 12, color: AppColors.green),
+                Text(' ${m.mobile}', style: const TextStyle(fontSize: 12, color: AppColors.muted)),
               ]),
             ]),
           ),

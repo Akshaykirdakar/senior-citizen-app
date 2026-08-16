@@ -123,7 +123,7 @@ class PdfService {
               row('मोबाईल नं.', m.mobile),
               row('संपर्क मोबाईल', m.contactMobile),
               row('जन्मतारीख', _fmt(m.dob)),
-              row('संपूर्ण पत्ता', m.address),
+              row('संपूर्ण पत्ता', m.fullAddress),
               row('शिक्षण', m.education),
               row('व्यवसाय', m.occupation),
               row('समाजकार्याची आवड', m.social ? 'आहे' : 'नाही'),
@@ -149,7 +149,7 @@ class PdfService {
   }
 
   /// Full members register as a printable table.
-  static Future<void> membersList(List<Member> members) async {
+  static Future<void> membersList(List<Member> members, {String title = 'सभासद यादी'}) async {
     await _loadFonts();
     final theme = pw.ThemeData.withFont(base: _regular, bold: _bold);
     final doc = pw.Document(theme: theme);
@@ -160,7 +160,7 @@ class PdfService {
     doc.addPage(pw.MultiPage(
       pageFormat: PdfPageFormat.a4,
       build: (_) => [
-        pw.Text('सभासद यादी — माळशिरस तालुका ज्येष्ठ नागरिक संघ, अकलूज',
+        pw.Text('$title — माळशिरस तालुका ज्येष्ठ नागरिक संघ, अकलूज',
             style: pw.TextStyle(fontSize: 15, fontWeight: pw.FontWeight.bold)),
         pw.SizedBox(height: 4),
         pw.Text(
@@ -173,16 +173,15 @@ class PdfService {
           headerDecoration: const pw.BoxDecoration(color: _green),
           cellStyle: const pw.TextStyle(fontSize: 10),
           cellAlignment: pw.Alignment.centerLeft,
-          headers: ['क्र.', 'नाव', 'लिंग', 'वय', 'मोबाईल', 'गाव', 'फी'],
+          headers: ['क्र.', 'नाव', 'पत्ता', 'मोबाईल', 'लिंग', 'वय'],
           data: members
               .map((m) => [
                     m.memberNo,
                     m.name,
+                    m.fullAddress,
+                    m.mobile,
                     m.genderLabel,
                     '${m.age}',
-                    m.mobile,
-                    m.address,
-                    'रु.${m.fee}',
                   ])
               .toList(),
         ),

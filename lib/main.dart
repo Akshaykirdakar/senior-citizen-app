@@ -7,6 +7,7 @@ import 'screens/home_screen.dart';
 import 'screens/members_screen.dart';
 import 'screens/reports_screen.dart';
 import 'screens/add_member_screen.dart';
+import 'screens/masters_screen.dart';
 
 void main() => runApp(const SanghApp());
 
@@ -72,7 +73,7 @@ class _HomeShellState extends State<HomeShell> {
   @override
   Widget build(BuildContext context) {
     final pages = [
-      HomeScreen(members: _members, onAdd: _openAdd, onGoTab: (i) => setState(() => _tab = i)),
+      HomeScreen(members: _members, onAdd: _openAdd, onGoTab: (i) => setState(() => _tab = i), onDataChanged: _reload),
       MembersScreen(members: _members, onChanged: _reload),
       ReportsScreen(members: _members),
     ];
@@ -121,6 +122,13 @@ class _HomeShellState extends State<HomeShell> {
         backgroundColor: AppColors.green,
         foregroundColor: Colors.white,
         toolbarHeight: 72,
+        actions: [
+          IconButton(
+            tooltip: 'गाव / तालुका / जिल्हा मास्टर',
+            icon: const Icon(Icons.tune),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MastersScreen())),
+          ),
+        ],
         title: Row(children: [
           Container(
             width: 40,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../models/member.dart';
+import '../services/pdf_service.dart';
+import '../services/excel_service.dart';
 
 class ReportsScreen extends StatelessWidget {
   final List<Member> members;
@@ -33,6 +35,26 @@ class ReportsScreen extends StatelessWidget {
     }
 
     return ListView(padding: const EdgeInsets.fromLTRB(16, 16, 16, 96), children: [
+      Row(children: [
+        Expanded(
+          child: FilledButton.icon(
+            onPressed: () => PdfService.membersList(members, title: 'संपूर्ण सभासद यादी'),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.marigold, foregroundColor: const Color(0xFF3A2400), minimumSize: const Size.fromHeight(46)),
+            icon: const Icon(Icons.picture_as_pdf, size: 18),
+            label: const Text('यादी PDF', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: FilledButton.icon(
+            onPressed: () => ExcelService.export(members, filename: 'सभासद-यादी'),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.green, foregroundColor: Colors.white, minimumSize: const Size.fromHeight(46)),
+            icon: const Icon(Icons.grid_on, size: 18),
+            label: const Text('Excel', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ),
+      ]),
+      const SizedBox(height: 12),
       _card('स्त्री–पुरुष प्रमाण', Column(children: [
         _bar('पुरुष', male, total, AppColors.male),
         const SizedBox(height: 8),
@@ -40,6 +62,8 @@ class ReportsScreen extends StatelessWidget {
         const SizedBox(height: 8),
         Text('एकूण $total सभासद', style: const TextStyle(fontSize: 12, color: AppColors.muted)),
       ])),
+      _card('गावानुसार सभासद', _bars(_count((m) => m.village), total, AppColors.green)),
+      _VillageReport(members: members),
       _card('वयोगटानुसार सभासद', _bars(ageMap, total, AppColors.green)),
       _card('शिक्षणानुसार', _bars(_count((m) => m.education), total, AppColors.marigold)),
       _card('व्यवसायानुसार', _bars(_count((m) => m.occupation), total, AppColors.male)),
@@ -107,4 +131,78 @@ class ReportsScreen extends StatelessWidget {
         Text(label, style: const TextStyle(fontSize: 14, color: AppColors.ink)),
         Text('रु. $amount', style: TextStyle(fontWeight: FontWeight.bold, color: color)),
       ]);
+}
+
+
+class _VillageReport extends StatefulWidget {
+  final List<Member> members;
+  const _VillageReport({required this.members});
+  @override
+  State<_VillageReport> createState() => _VillageReportState();
+}
+
+class _VillageReportState extends State<_VillageReport> {
+  String? _v;
+  @override
+  Widget build(BuildContext context) {
+    final villages = widget.members.map((m) => m.village).where((x) => x.isNotEmpty).toSet().toList()..sort();
+    final list = widget.members.where((m) => m.village == _v).toList();
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.line)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('स्वतंत्र गावाचा रिपोर्ट', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: AppColors.ink)),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String>(
+          value: _v,
+          isExpanded: true,
+          hint: const Text('गाव निवडा'),
+          decoration: InputDecoration(
+            isDense: true, filled: true, fillColor: AppColors.cream,
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.line)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.green)),
+          ),
+          items: villages.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+          onChanged: (x) => setState(() => _v = x),
+        ),
+        if (_v != null) ...[
+          const SizedBox(height: 12),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Expanded(child: Text('$_v — ${list.length} सभासद', style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.ink))),
+            const SizedBox(width: 6),
+            Wrap(spacing: 6, children: [
+              FilledButton.icon(
+                onPressed: () => PdfService.membersList(list, title: '$_v गाव — सभासद यादी'),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.marigold, foregroundColor: const Color(0xFF3A2400), visualDensity: VisualDensity.compact),
+                icon: const Icon(Icons.picture_as_pdf, size: 16),
+                label: const Text('PDF'),
+              ),
+              FilledButton.icon(
+                onPressed: () => ExcelService.export(list, filename: '$_v-सभासद'),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.green, foregroundColor: Colors.white, visualDensity: VisualDensity.compact),
+                icon: const Icon(Icons.grid_on, size: 16),
+                label: const Text('Excel'),
+              ),
+            ]),
+          ]),
+          const SizedBox(height: 8),
+          for (final m in list)
+            Container(
+              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(children: [
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(m.name, style: const TextStyle(fontWeight: FontWeight.w500, color: AppColors.ink)),
+                    Text(m.fullAddress, style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+                  ]),
+                ),
+                Text(m.mobile, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.green)),
+              ]),
+            ),
+        ],
+      ]),
+    );
+  }
 }

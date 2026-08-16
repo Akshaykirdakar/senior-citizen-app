@@ -4,6 +4,7 @@ import '../theme.dart';
 import '../models/member.dart';
 import '../data/member_repo.dart';
 import '../services/pdf_service.dart';
+import 'add_member_screen.dart';
 
 class MemberDetailScreen extends StatelessWidget {
   final Member member;
@@ -28,6 +29,18 @@ class MemberDetailScreen extends StatelessWidget {
           pinned: true,
           expandedHeight: 168,
           actions: [
+            TextButton.icon(
+              onPressed: () async {
+                final ok = await Navigator.push<bool>(context,
+                    MaterialPageRoute(builder: (_) => AddMemberScreen(existing: m)));
+                if (ok == true && context.mounted) {
+                  await onChanged();
+                  Navigator.pop(context);
+                }
+              },
+              icon: const Icon(Icons.edit, color: Colors.white, size: 16),
+              label: const Text('एडिट', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
             TextButton.icon(
               onPressed: () => PdfService.memberCard(m),
               icon: const Icon(Icons.picture_as_pdf, color: Color(0xFF3A2400), size: 16),
@@ -85,7 +98,7 @@ class MemberDetailScreen extends StatelessWidget {
                 _row(Icons.phone, 'मोबाईल नं.', m.mobile),
                 if (m.contactMobile.isNotEmpty) _row(Icons.phone, 'संपर्क मोबाईल नं.', m.contactMobile),
                 _row(Icons.cake, 'जन्मतारीख', '${_fmt(m.dob)}  (वय ${m.age})'),
-                _row(Icons.location_on, 'संपूर्ण पत्ता', m.address),
+                _row(Icons.location_on, 'संपूर्ण पत्ता', m.fullAddress),
                 _row(Icons.school, 'शिक्षण', m.education),
                 _row(Icons.work, 'व्यवसाय', m.occupation),
                 _row(Icons.volunteer_activism, 'समाजकार्याची आवड', m.social ? 'आहे' : 'नाही'),
