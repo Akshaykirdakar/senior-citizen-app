@@ -23,6 +23,8 @@ class _MembersScreenState extends State<MembersScreen> {
       if (_filter == 'M' && m.gender != 'M') return false;
       if (_filter == 'F' && m.gender != 'F') return false;
       if (_filter == 'social' && !m.social) return false;
+      if (_filter == 'alive' && m.deceased) return false;
+      if (_filter == 'dead' && !m.deceased) return false;
       if (_q.isEmpty) return true;
       final s = _q.toLowerCase();
       return (m.name + m.memberNo + m.mobile + m.village).toLowerCase().contains(s);
@@ -32,6 +34,8 @@ class _MembersScreenState extends State<MembersScreen> {
       ['all', 'सर्व'],
       ['M', 'पुरुष'],
       ['F', 'महिला'],
+      ['alive', 'हयात'],
+      ['dead', 'मयत'],
       ['social', 'समाजकार्य'],
     ];
 
@@ -144,7 +148,10 @@ class _MembersScreenState extends State<MembersScreen> {
               Text(m.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.ink)),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 15,
+                      color: m.deceased ? AppColors.muted : AppColors.ink,
+                      decoration: m.deceased ? TextDecoration.lineThrough : TextDecoration.none)),
               const SizedBox(height: 2),
               Row(children: [
                 Text('#${m.memberNo}',
@@ -159,6 +166,14 @@ class _MembersScreenState extends State<MembersScreen> {
                   child: Text(m.genderLabel,
                       style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: tint)),
                 ),
+                if (m.deceased) ...[
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                    decoration: BoxDecoration(color: const Color(0xFFEDEDED), borderRadius: BorderRadius.circular(20)),
+                    child: Text('मयत ${m.deathDateFmt}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.danger)),
+                  ),
+                ],
               ]),
               const SizedBox(height: 2),
               Row(children: [

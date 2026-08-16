@@ -102,9 +102,12 @@ class MemberDetailScreen extends StatelessWidget {
                 _row(Icons.school, 'शिक्षण', m.education),
                 _row(Icons.work, 'व्यवसाय', m.occupation),
                 _row(Icons.volunteer_activism, 'समाजकार्याची आवड', m.social ? 'आहे' : 'नाही'),
+                _row(m.deceased ? Icons.sentiment_very_dissatisfied : Icons.favorite,
+                    'सभासद स्थिती', m.deceased ? ('मयत · ' + m.deathDateFmt) : 'हयात'),
               ]),
               _section('सभासदत्व व फी'),
               _card([
+                _row(Icons.confirmation_number, 'नोंदणी क्रमांक', m.regNo),
                 _row(Icons.account_balance_wallet, 'प्रवेश फी', 'रु. ${m.fee}/– (${m.genderLabel})'),
                 _row(Icons.receipt_long, 'पावती क्रमांक', m.receiptNo),
                 _row(Icons.event, 'प्रवेश दिनांक', _fmt(m.joinDate)),

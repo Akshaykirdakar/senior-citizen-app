@@ -12,9 +12,10 @@ class ExcelService {
     excel.setDefaultSheet('सभासद');
 
     const headers = [
-      'क्र.', 'सभासद क्र.', 'नाव', 'लिंग', 'वय', 'मोबाईल', 'संपर्क मोबाईल',
+      'क्र.', 'सभासद क्र.', 'नोंदणी क्र.', 'नाव', 'लिंग', 'वय', 'मोबाईल', 'संपर्क मोबाईल',
       'एरिया', 'गाव', 'तालुका', 'जिल्हा', 'जन्मतारीख', 'शिक्षण', 'व्यवसाय',
       'प्रवेश फी', 'पावती क्र.', 'प्रवेश दिनांक', 'समाजकार्य',
+      'स्थिती', 'मयत तारीख',
       'आपत्कालीन नाव', 'आपत्कालीन मोबाईल', 'फॅमिली डॉक्टर',
     ];
     sheet.appendRow(headers.map((h) => TextCellValue(h)).toList());
@@ -24,6 +25,7 @@ class ExcelService {
       sheet.appendRow(<CellValue?>[
         TextCellValue('${i + 1}'),
         TextCellValue(m.memberNo),
+        TextCellValue(m.regNo),
         TextCellValue(m.name),
         TextCellValue(m.genderLabel),
         TextCellValue('${m.age}'),
@@ -40,6 +42,8 @@ class ExcelService {
         TextCellValue(m.receiptNo),
         TextCellValue(m.joinDate),
         TextCellValue(m.social ? 'आहे' : 'नाही'),
+        TextCellValue(m.deceased ? 'मयत' : 'हयात'),
+        TextCellValue(m.deathDateFmt),
         TextCellValue(m.emName),
         TextCellValue(m.emMobile),
         TextCellValue(m.doctor),

@@ -8,8 +8,13 @@ import 'screens/members_screen.dart';
 import 'screens/reports_screen.dart';
 import 'screens/add_member_screen.dart';
 import 'screens/masters_screen.dart';
+import 'services/notification_service.dart';
 
-void main() => runApp(const SanghApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService.init();
+  runApp(const SanghApp());
+}
 
 class SanghApp extends StatelessWidget {
   const SanghApp({super.key});
@@ -47,6 +52,7 @@ class _HomeShellState extends State<HomeShell> {
       _members = data;
       _loading = false;
     });
+    NotificationService.syncBirthdayReminders(data);
   }
 
   Future<void> _openAdd() async {

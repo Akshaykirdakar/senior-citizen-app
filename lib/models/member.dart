@@ -1,7 +1,8 @@
 /// A single सभासद (member) record, mirroring the प्रवेश अर्ज fields.
 class Member {
   int? id;
-  String memberNo; // आजीव सभासद क्रमांक
+  String memberNo; // आजीव सभासद क्रमांक (auto, editable)
+  String regNo; // नोंदणी क्रमांक
   String gender; // 'M' पुरुष / 'F' महिला
   String name; // संपूर्ण नाव
   String area; // एरिया / भाग
@@ -16,6 +17,8 @@ class Member {
   String receiptNo; // पावती क्रमांक
   String joinDate; // प्रवेश दिनांक (ISO)
   bool social; // समाजकार्याची आवड
+  bool deceased; // मयत
+  String deathDate; // मयत तारीख (ISO)
   String emName; // आपत्कालीन संपर्क - नाव
   String emMobile; // आपत्कालीन संपर्क - मोबाईल
   String emAddress; // आपत्कालीन संपर्क - पत्ता
@@ -25,6 +28,7 @@ class Member {
   Member({
     this.id,
     required this.memberNo,
+    this.regNo = '',
     required this.gender,
     required this.name,
     this.area = '',
@@ -39,6 +43,8 @@ class Member {
     this.receiptNo = '',
     this.joinDate = '',
     this.social = true,
+    this.deceased = false,
+    this.deathDate = '',
     this.emName = '',
     this.emMobile = '',
     this.emAddress = '',
@@ -51,6 +57,13 @@ class Member {
 
   int get fee => gender == 'M' ? feeMale : feeFemale;
   String get genderLabel => gender == 'M' ? 'पुरुष' : 'महिला';
+
+  String get deathDateFmt {
+    if (deathDate.isEmpty) return '';
+    final p = deathDate.split('-');
+    return p.length == 3 ? '${p[2]}/${p[1]}/${p[0]}' : deathDate;
+  }
+  String get statusRemark => deceased ? ('मयत ' + deathDateFmt).trim() : 'हयात';
 
   String get fullAddress {
     final parts = <String>[];
@@ -110,6 +123,7 @@ class Member {
   Map<String, Object?> toMap() => {
         'id': id,
         'memberNo': memberNo,
+        'regNo': regNo,
         'gender': gender,
         'name': name,
         'area': area,
@@ -124,6 +138,8 @@ class Member {
         'receiptNo': receiptNo,
         'joinDate': joinDate,
         'social': social ? 1 : 0,
+        'deceased': deceased ? 1 : 0,
+        'deathDate': deathDate,
         'emName': emName,
         'emMobile': emMobile,
         'emAddress': emAddress,
@@ -134,6 +150,7 @@ class Member {
   factory Member.fromMap(Map<String, Object?> m) => Member(
         id: m['id'] as int?,
         memberNo: (m['memberNo'] ?? '') as String,
+        regNo: (m['regNo'] ?? '') as String,
         gender: (m['gender'] ?? 'M') as String,
         name: (m['name'] ?? '') as String,
         area: (m['area'] ?? '') as String,
@@ -148,6 +165,8 @@ class Member {
         receiptNo: (m['receiptNo'] ?? '') as String,
         joinDate: (m['joinDate'] ?? '') as String,
         social: (m['social'] ?? 1) == 1,
+        deceased: (m['deceased'] ?? 0) == 1,
+        deathDate: (m['deathDate'] ?? '') as String,
         emName: (m['emName'] ?? '') as String,
         emMobile: (m['emMobile'] ?? '') as String,
         emAddress: (m['emAddress'] ?? '') as String,

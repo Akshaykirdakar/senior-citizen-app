@@ -34,27 +34,19 @@ class ReportsScreen extends StatelessWidget {
       if (c > 0) ageMap[b] = c;
     }
 
+    final alive = members.where((m) => !m.deceased).toList();
+    final dead = members.where((m) => m.deceased).toList();
     return ListView(padding: const EdgeInsets.fromLTRB(16, 16, 16, 96), children: [
-      Row(children: [
-        Expanded(
-          child: FilledButton.icon(
-            onPressed: () => PdfService.membersList(members, title: 'संपूर्ण सभासद यादी'),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.marigold, foregroundColor: const Color(0xFF3A2400), minimumSize: const Size.fromHeight(46)),
-            icon: const Icon(Icons.picture_as_pdf, size: 18),
-            label: const Text('यादी PDF', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: FilledButton.icon(
-            onPressed: () => ExcelService.export(members, filename: 'सभासद-यादी'),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.green, foregroundColor: Colors.white, minimumSize: const Size.fromHeight(46)),
-            icon: const Icon(Icons.grid_on, size: 18),
-            label: const Text('Excel', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ),
-      ]),
-      const SizedBox(height: 12),
+      _card('याद्या एक्सपोर्ट (PDF / Excel)', Column(children: [
+        _expRow('एकूण यादी', members, 'एकूण-सभासद'),
+        _expRow('हयात यादी', alive, 'हयात-सभासद'),
+        _expRow('मयत यादी', dead, 'मयत-सभासद'),
+      ])),
+      _card('हयात / मयत', Column(children: [
+        _bar('हयात', alive.length, members.length, AppColors.green),
+        const SizedBox(height: 8),
+        _bar('मयत', dead.length, members.length, AppColors.danger),
+      ])),
       _card('स्त्री–पुरुष प्रमाण', Column(children: [
         _bar('पुरुष', male, total, AppColors.male),
         const SizedBox(height: 8),
@@ -86,6 +78,23 @@ class ReportsScreen extends StatelessWidget {
       ])),
     ]);
   }
+
+  Widget _expRow(String label, List<Member> list, String fname) => Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Row(children: [
+          Expanded(child: Text('$label (${list.length})', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink))),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.picture_as_pdf, color: AppColors.marigold),
+            onPressed: list.isEmpty ? null : () => PdfService.membersList(list, title: label),
+          ),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.grid_on, color: AppColors.green),
+            onPressed: list.isEmpty ? null : () => ExcelService.export(list, filename: fname),
+          ),
+        ]),
+      );
 
   Widget _card(String title, Widget child) => Container(
         margin: const EdgeInsets.only(bottom: 12),

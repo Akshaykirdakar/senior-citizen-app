@@ -13,16 +13,23 @@ class PdfService {
 
   static Future<void> _loadFonts() async {
     if (_regular != null) return;
-    try {
-      _regular = pw.Font.ttf(
-          await rootBundle.load('assets/fonts/NotoSansDevanagari-Regular.ttf'));
-      _bold = pw.Font.ttf(
-          await rootBundle.load('assets/fonts/NotoSansDevanagari-Bold.ttf'));
-    } catch (_) {
-      // Fallback: default font (Latin only) if the asset is missing.
-      _regular = pw.Font.helvetica();
-      _bold = pw.Font.helveticaBold();
+    // Mukta is a STATIC Devanagari+Latin TTF that the pdf package parses and
+    // renders. (The earlier variable Noto font failed to parse and fell back to
+    // Helvetica, which shows tofu boxes for Marathi.)
+    for (final base in ['Mukta-Regular.ttf', 'NotoSansDevanagari-Regular.ttf']) {
+      try {
+        _regular = pw.Font.ttf(await rootBundle.load('assets/fonts/' + base));
+        final boldName = base.replaceAll('Regular', 'Bold');
+        try {
+          _bold = pw.Font.ttf(await rootBundle.load('assets/fonts/' + boldName));
+        } catch (_) {
+          _bold = _regular;
+        }
+        return;
+      } catch (_) {}
     }
+    _regular = pw.Font.helvetica();
+    _bold = pw.Font.helveticaBold();
   }
 
   static const _green = PdfColor.fromInt(0xFF14503C);
@@ -127,6 +134,7 @@ class PdfService {
               row('शिक्षण', m.education),
               row('व्यवसाय', m.occupation),
               row('समाजकार्याची आवड', m.social ? 'आहे' : 'नाही'),
+              row('नोंदणी क्रमांक', m.regNo),
               row('प्रवेश फी', 'रु. ${m.fee}/–'),
               row('पावती क्रमांक', m.receiptNo),
               row('प्रवेश दिनांक', _fmt(m.joinDate)),
@@ -173,15 +181,16 @@ class PdfService {
           headerDecoration: const pw.BoxDecoration(color: _green),
           cellStyle: const pw.TextStyle(fontSize: 10),
           cellAlignment: pw.Alignment.centerLeft,
-          headers: ['क्र.', 'नाव', 'पत्ता', 'मोबाईल', 'लिंग', 'वय'],
+          headers: ['क्र.', 'नोंदणी', 'नाव', 'पत्ता', 'मोबाईल', 'वय', 'शेरा'],
           data: members
               .map((m) => [
                     m.memberNo,
+                    m.regNo,
                     m.name,
                     m.fullAddress,
                     m.mobile,
-                    m.genderLabel,
                     '${m.age}',
+                    m.statusRemark,
                   ])
               .toList(),
         ),

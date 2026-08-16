@@ -3,6 +3,7 @@ import '../theme.dart';
 import '../models/member.dart';
 import 'birthdays_screen.dart';
 import 'backup_screen.dart';
+import 'meeting_message_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final List<Member> members;
@@ -84,23 +85,11 @@ class HomeScreen extends StatelessWidget {
           ),
         ]),
         const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: AppColors.marigoldSoft,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.marigold.withOpacity(0.35)),
-          ),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: const [
-            Icon(Icons.notifications, color: AppColors.marigold, size: 18),
-            SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                'सभेची आठवण: प्रत्येक महिन्याच्या पहिल्या रविवारी दुपारी ४:०० वा. स.मा. विद्यालय, अकलूज येथे सर्व सभासदांची सभा.',
-                style: TextStyle(fontSize: 12.5, height: 1.4, color: AppColors.ink),
-              ),
-            ),
-          ]),
+        FilledButton.icon(
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MeetingMessageScreen(members: members))),
+          style: FilledButton.styleFrom(backgroundColor: AppColors.green, foregroundColor: Colors.white, minimumSize: const Size.fromHeight(48)),
+          icon: const Icon(Icons.campaign),
+          label: const Text('मिटींग मेसेज पाठवा', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
         ),
       ],
     );

@@ -18,13 +18,15 @@ class AddMemberScreen extends StatefulWidget {
 class _AddMemberScreenState extends State<AddMemberScreen> {
   final _form = GlobalKey<FormState>();
   final _c = <String, TextEditingController>{
-    for (final k in ['name', 'area', 'mob', 'cmob', 'edu', 'occ', 'receipt', 'eName', 'eMob', 'eAddr', 'doctor'])
+    for (final k in ['no', 'reg', 'name', 'area', 'mob', 'cmob', 'edu', 'occ', 'receipt', 'eName', 'eMob', 'eAddr', 'doctor'])
       k: TextEditingController(),
   };
   String _gender = 'M';
   bool _social = true;
   DateTime? _dob;
   DateTime _join = DateTime.now();
+  bool _deceased = false;
+  DateTime? _death;
   String? _photoPath;
   String _memberNo = '----';
   String? _village;
@@ -40,8 +42,12 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
     final e = widget.existing;
     if (e != null) {
       _memberNo = e.memberNo;
+      _c['no']!.text = e.memberNo;
+      _c['reg']!.text = e.regNo;
       _gender = e.gender;
       _social = e.social;
+      _deceased = e.deceased;
+      _death = e.deathDate.isEmpty ? null : DateTime.tryParse(e.deathDate);
       _photoPath = e.photoPath;
       _village = e.village.isEmpty ? null : e.village;
       _taluka = e.taluka.isEmpty ? null : e.taluka;
@@ -60,7 +66,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
       _c['eAddr']!.text = e.emAddress;
       _c['doctor']!.text = e.doctor;
     } else {
-      MemberRepo.instance.nextMemberNo().then((n) => setState(() => _memberNo = n));
+      MemberRepo.instance.nextMemberNo().then((n) => setState(() { _memberNo = n; _c['no']!.text = n; }));
     }
     _loadMasters();
   }
@@ -168,7 +174,8 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   Future<void> _save() async {
     if (!_form.currentState!.validate()) return;
     final m = Member(
-      memberNo: _memberNo,
+      memberNo: _c['no']!.text.trim().isEmpty ? _memberNo : _c['no']!.text.trim(),
+      regNo: _c['reg']!.text.trim(),
       gender: _gender,
       name: _c['name']!.text.trim(),
       area: _c['area']!.text.trim(),
@@ -183,6 +190,8 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
       receiptNo: _c['receipt']!.text.trim(),
       joinDate: _iso(_join),
       social: _social,
+      deceased: _deceased,
+      deathDate: _deceased ? _iso(_death) : '',
       emName: _c['eName']!.text.trim(),
       emMobile: _c['eMob']!.text.trim(),
       emAddress: _c['eAddr']!.text.trim(),
@@ -255,6 +264,11 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
           ]),
           const SizedBox(height: 4),
 
+          Row(children: [
+            Expanded(child: _text('no', 'आजीव सभासद क्रमांक', hint: 'आपोआप — बदलता येईल')),
+            const SizedBox(width: 12),
+            Expanded(child: _text('reg', 'नोंदणी क्रमांक', hint: 'उदा. १०१')),
+          ]),
           _text('name', '१. संपूर्ण नाव', required: true, hint: 'उदा. रामचंद्र गोविंद देशमुख'),
           const Padding(
             padding: EdgeInsets.only(bottom: 8, left: 2),
@@ -290,6 +304,17 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
             const SizedBox(width: 10),
             _toggle('नाही', !_social, () => setState(() => _social = false)),
           ]),
+
+          _label('सभासद स्थिती'),
+          Row(children: [
+            _toggle('हयात', !_deceased, () => setState(() => _deceased = false)),
+            const SizedBox(width: 10),
+            _toggle('मयत', _deceased, () => setState(() => _deceased = true)),
+          ]),
+          if (_deceased) ...[
+            const SizedBox(height: 14),
+            _dateField('मयत तारीख', _death, (d) => setState(() => _death = d)),
+          ],
           const SizedBox(height: 8),
 
           _label('९. आपत्कालीन संपर्क (अर्जदाराच्या व्यतिरिक्त)'),
