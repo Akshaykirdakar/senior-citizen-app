@@ -44,15 +44,16 @@ class NotificationService {
       final when = _nextBirthday8am(d);
       try {
         await _plugin.zonedSchedule(
-          id++,
-          'आज वाढदिवस 🎉',
-          '${m.name} यांना वाढदिवसाच्या शुभेच्छा द्या (वय ${m.turningAge})',
-          when,
-          _details,
-          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-          matchDateTimeComponents: DateTimeComponents.dateAndTime, // repeat yearly
-        );
-      } catch (_) {
+  id++,
+  'आज वाढदिवस 🎉',
+  '${m.name} यांना वाढदिवसाच्या शुभेच्छा द्या (वय ${m.turningAge})',
+  when,
+  _details,
+  androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+  uiLocalNotificationDateInterpretation:
+      UILocalNotificationDateInterpretation.absoluteTime,
+  matchDateTimeComponents: DateTimeComponents.dateAndTime,
+);      } catch (_) {
         // ignore scheduling errors for individual members
       }
       if (id > 1300) break;
