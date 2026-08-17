@@ -32,20 +32,30 @@ A Flutter (Android) app for the senior citizens' association membership register
 4. When it finishes (~5 min), open the run and download **senior-sangh-apk** from *Artifacts*.
 5. Copy `app-release.apk` to the phone and install (allow "install from unknown sources").
 
-The project bundles the **Tiro Devanagari Marathi** font in `assets/fonts/`, so Marathi PDF text works offline and the font is embedded in the generated PDFs.
+The workflow at `.github/workflows/build-apk.yml` also downloads the Devanagari
+font automatically so Marathi shows correctly inside the PDFs.
 
 ## Build it yourself (on a computer with Flutter)
 
 ```bash
 flutter create --platforms=android --project-name senior_sangh .
-# Tiro Devanagari Marathi is already bundled in assets/fonts/
+mkdir -p assets/fonts
+# Static Devanagari font so PDFs render Marathi (the CI does this automatically):
+curl -fL "https://raw.githubusercontent.com/google/fonts/main/ofl/mukta/Mukta-Regular.ttf" -o assets/fonts/Mukta-Regular.ttf
+curl -fL "https://raw.githubusercontent.com/google/fonts/main/ofl/mukta/Mukta-Bold.ttf"    -o assets/fonts/Mukta-Bold.ttf
 python3 tool/patch_android.py   # enables notification permissions + desugaring
 flutter pub get
 flutter build apk --release
 # APK: build/app/outputs/flutter-apk/app-release.apk
 ```
 
-> Marathi in PDFs: the app bundles **Tiro Devanagari Marathi** locally and embeds it into generated PDFs, so Marathi rendering does not require an internet connection. The existing runtime Mukta fallback is retained for compatibility.
+> Marathi in PDFs: the app embeds the **static Mukta** font (Devanagari), and if
+> the bundled font is somehow missing it downloads it once at runtime (needs
+> internet). The release manifest gets the INTERNET permission via the CI patch.
+> The
+> earlier variable Noto font failed to parse and showed boxes (tofu) — Mukta
+> fixes that. The CI downloads it automatically; for local builds run the two
+> `curl` lines above before `flutter build`.
 
 ## Google Drive setup (for the direct Drive buttons)
 The "थेट Google Drive" buttons need a one-time Google Cloud setup:
@@ -72,3 +82,5 @@ lib/
     add_member_screen.dart      data-entry form + photo
     reports_screen.dart         charts / breakdowns
 ```
+### Marathi PDF font
+PDFs use the bundled `assets/fonts/Mukta-Regular.ttf` font. The font is embedded in generated PDFs, so Marathi output does not depend on an internet connection or device-installed fonts.

@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'package:characters/characters.dart';
-import 'dart:typed_data';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:http/http.dart' as http;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -13,70 +11,21 @@ import '../models/member.dart';
 class PdfService {
   static pw.Font? _regular, _bold;
 
-  static const _regUrl =
-      'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/mukta/Mukta-Regular.ttf';
-  static const _boldUrl =
-      'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/mukta/Mukta-Bold.ttf';
+  static const _regUrl = 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/mukta/Mukta-Regular.ttf';
+  static const _boldUrl = 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/mukta/Mukta-Bold.ttf';
 
   static Future<void> _loadFonts() async {
     if (_regular != null) return;
 
-    // 1) Bundled Tiro Devanagari Marathi font (offline and preferred).
-    // This is included in the APK and embedded directly into the PDF.
-    try {
-      _regular = pw.Font.ttf(
-        await rootBundle.load(
-          'assets/fonts/TiroDevanagariMarathi-Regular.ttf',
-        ),
-      );
-      // Tiro Marathi regular is used for both weights when a separate bold
-      // face is not bundled, preserving Marathi glyph coverage.
-      _bold = _regular;
-      return;
-    } catch (_) {}
+    // Bundled Mukta Regular font. It is embedded in the generated PDF,
+    // so Marathi/Devanagari output does not depend on internet/system fonts.
+    _regular = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/Mukta-Regular.ttf'),
+    );
 
-    // 2) Existing bundled fonts as a compatibility fallback.
-    for (final base in [
-      'Mukta-Regular.ttf',
-      'NotoSansDevanagari-Regular.ttf',
-    ]) {
-      try {
-        _regular = pw.Font.ttf(
-          await rootBundle.load('assets/fonts/$base'),
-        );
-        final boldName = base.replaceAll('Regular', 'Bold');
-        try {
-          _bold = pw.Font.ttf(
-            await rootBundle.load('assets/fonts/$boldName'),
-          );
-        } catch (_) {
-          _bold = _regular;
-        }
-        return;
-      } catch (_) {}
-    }
-
-    // 3) Existing runtime download fallback for older installations/builds.
-    try {
-      final reg = await http.get(Uri.parse(_regUrl));
-      if (reg.statusCode == 200 && reg.bodyBytes.length > 5000) {
-        _regular = pw.Font.ttf(ByteData.sublistView(reg.bodyBytes));
-        try {
-          final bol = await http.get(Uri.parse(_boldUrl));
-          _bold = (bol.statusCode == 200 && bol.bodyBytes.length > 5000)
-              ? pw.Font.ttf(ByteData.sublistView(bol.bodyBytes))
-              : _regular;
-        } catch (_) {
-          _bold = _regular;
-        }
-        return;
-      }
-    } catch (_) {}
-
-    // 4) Last resort for Latin-only text. Marathi should never reach this
-    // path in a normal build because the Tiro font is bundled.
-    _regular = pw.Font.helvetica();
-    _bold = pw.Font.helveticaBold();
+    // Use the same embedded Mukta Regular font for bold text to preserve
+    // Devanagari rendering without requiring a second font file.
+    _bold = _regular!;
   }
 
   static const _green = PdfColor.fromInt(0xFF14503C);
