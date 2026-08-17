@@ -33,30 +33,58 @@ jobs:
       - name: Create Android platform
         run: flutter create --platforms=android .
 
-      - name: Enable Android core library desugaring
+      - name: Configure Android desugaring
+        shell: bash
         run: |
-          python3 - <<'PY'
+          python3 <<'PY'
           from pathlib import Path
+          import re
 
           path = Path("android/app/build.gradle.kts")
           text = path.read_text()
 
-          text = text.replace(
-              "compileOptions {",
-              """compileOptions {
-                  isCoreLibraryDesugaringEnabled = true"""
-          )
-
-          if 'coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")' not in text:
+          # Enable core library desugaring
+          if "isCoreLibraryDesugaringEnabled = true" not in text:
               text = text.replace(
-                  "dependencies {",
-                  """dependencies {
-                      coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")""",
-                  1
+                  "compileOptions {",
+                  """compileOptions {
+                      isCoreLibraryDesugaringEnabled = true"""
               )
 
+          # Add the required desugaring dependency
+          dependency = 'coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")'
+
+          if dependency not in text:
+              match = re.search(r"dependencies\s*\{", text)
+
+              if match:
+                  insert_at = match.end()
+                  text = (
+                      text[:insert_at]
+                      + "\n    "
+                      + dependency
+                      + text[insert_at:]
+                  )
+              else:
+                  text += f"""
+
+          dependencies {{
+              {dependency}
+          }}
+          """
+
           path.write_text(text)
+
+          print("===== FINAL android/app/build.gradle.kts =====")
+          print(text)
+          print("===== END android/app/build.gradle.kts =====")
           PY
+
+      - name: Verify desugaring configuration
+        run: |
+          echo "Checking desugaring configuration..."
+          grep -n "isCoreLibraryDesugaringEnabled" android/app/build.gradle.kts
+          grep -n "coreLibraryDesugaring" android/app/build.gradle.kts
 
       - name: Get Flutter packages
         run: flutter pub get
