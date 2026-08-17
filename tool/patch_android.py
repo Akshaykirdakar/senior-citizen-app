@@ -6,6 +6,7 @@ import os
 import re
 
 APP = "android/app"
+NDK = "27.0.12077973"
 
 
 def patch_manifest():
@@ -62,6 +63,11 @@ def _patch_groovy(path):
             s = re.sub(r"(android\s*\{)", r"\1\n    compileOptions {\n        coreLibraryDesugaringEnabled true\n        sourceCompatibility JavaVersion.VERSION_1_8\n        targetCompatibility JavaVersion.VERSION_1_8\n    }", s, count=1)
     if "desugar_jdk_libs" not in s:
         s += '\n\ndependencies {\n    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.4"\n}\n'
+    # NDK version required by plugins
+    if re.search(r"ndkVersion\s+", s):
+        s = re.sub(r"ndkVersion\s+[^\n]+", 'ndkVersion "%s"' % NDK, s, count=1)
+    else:
+        s = re.sub(r"(android\s*\{)", r'\1\n    ndkVersion "%s"' % NDK, s, count=1)
     open(path, "w", encoding="utf-8").write(s)
     print("groovy gradle patched")
 
@@ -75,6 +81,11 @@ def _patch_kts(path):
             s = re.sub(r"(android\s*\{)", r"\1\n    compileOptions {\n        isCoreLibraryDesugaringEnabled = true\n        sourceCompatibility = JavaVersion.VERSION_1_8\n        targetCompatibility = JavaVersion.VERSION_1_8\n    }", s, count=1)
     if "desugar_jdk_libs" not in s:
         s += '\n\ndependencies {\n    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")\n}\n'
+    # NDK version required by plugins
+    if re.search(r"ndkVersion\s*=", s):
+        s = re.sub(r"ndkVersion\s*=\s*[^\n]+", 'ndkVersion = "%s"' % NDK, s, count=1)
+    else:
+        s = re.sub(r"(android\s*\{)", r'\1\n    ndkVersion = "%s"' % NDK, s, count=1)
     open(path, "w", encoding="utf-8").write(s)
     print("kts gradle patched")
 
