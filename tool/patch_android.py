@@ -16,6 +16,7 @@ def patch_manifest():
         return
     s = open(path, encoding="utf-8").read()
     perms = [
+        '<uses-permission android:name="android.permission.INTERNET"/>',
         '<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>',
         '<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>',
         '<uses-permission android:name="android.permission.VIBRATE"/>',
