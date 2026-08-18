@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../models/member.dart';
 import '../services/pdf_service.dart';
+import '../services/report_pdf.dart';
 import '../services/excel_service.dart';
 
 class ReportsScreen extends StatelessWidget {
@@ -86,7 +87,7 @@ class ReportsScreen extends StatelessWidget {
           IconButton(
             visualDensity: VisualDensity.compact,
             icon: const Icon(Icons.picture_as_pdf, color: AppColors.marigold),
-            onPressed: list.isEmpty ? null : () => PdfService.membersList(list, title: label),
+            onPressed: list.isEmpty ? null : () => ReportPdf.membersList(list, title: label),
           ),
           IconButton(
             visualDensity: VisualDensity.compact,
@@ -182,7 +183,7 @@ class _VillageReportState extends State<_VillageReport> {
             const SizedBox(width: 6),
             Wrap(spacing: 6, children: [
               FilledButton.icon(
-                onPressed: () => PdfService.membersList(list, title: '$_v गाव — सभासद यादी'),
+                onPressed: () => ReportPdf.membersList(list, title: '$_v गाव — सभासद यादी'),
                 style: FilledButton.styleFrom(backgroundColor: AppColors.marigold, foregroundColor: const Color(0xFF3A2400), visualDensity: VisualDensity.compact),
                 icon: const Icon(Icons.picture_as_pdf, size: 16),
                 label: const Text('PDF'),

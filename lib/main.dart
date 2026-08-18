@@ -9,6 +9,7 @@ import 'screens/reports_screen.dart';
 import 'screens/add_member_screen.dart';
 import 'screens/masters_screen.dart';
 import 'services/notification_service.dart';
+import 'services/report_pdf.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -95,7 +96,7 @@ class _HomeShellState extends State<HomeShell> {
                 IconButton(
                   tooltip: 'यादी PDF',
                   icon: const Icon(Icons.picture_as_pdf),
-                  onPressed: () => PdfService.membersList(_members),
+                  onPressed: () => ReportPdf.membersList(_members),
                 )
               ]
             : null,
