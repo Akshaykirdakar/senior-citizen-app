@@ -162,21 +162,33 @@ class PdfService {
     final fees = members.fold<int>(0, (s, m) => s + m.fee);
 
     doc.addPage(pw.MultiPage(
-      pageFormat: PdfPageFormat.a4,
+      pageFormat: PdfPageFormat.a4.landscape,
+      margin: const pw.EdgeInsets.all(24),
       build: (_) => [
         pw.Text('$title — माळशिरस तालुका ज्येष्ठ नागरिक संघ, अकलूज',
-            style: pw.TextStyle(fontSize: 15, fontWeight: pw.FontWeight.bold)),
+            style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
         pw.SizedBox(height: 4),
         pw.Text(
             'एकूण $total · पुरुष $male · महिला ${total - male} · जमा फी रु. $fees/–',
-            style: const pw.TextStyle(fontSize: 11, color: _muted)),
+            style: const pw.TextStyle(fontSize: 12, color: _muted)),
         pw.SizedBox(height: 10),
         pw.TableHelper.fromTextArray(
           headerStyle: pw.TextStyle(
-              fontWeight: pw.FontWeight.bold, color: PdfColors.white, fontSize: 10),
+              fontWeight: pw.FontWeight.bold, color: PdfColors.white, fontSize: 12),
           headerDecoration: const pw.BoxDecoration(color: _green),
-          cellStyle: const pw.TextStyle(fontSize: 10),
+          cellStyle: const pw.TextStyle(fontSize: 12),
+          cellPadding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 5),
           cellAlignment: pw.Alignment.centerLeft,
+          headerAlignment: pw.Alignment.centerLeft,
+          columnWidths: {
+            0: const pw.FixedColumnWidth(42),
+            1: const pw.FixedColumnWidth(52),
+            2: const pw.FlexColumnWidth(3.2),
+            3: const pw.FlexColumnWidth(4.2),
+            4: const pw.FixedColumnWidth(90),
+            5: const pw.FixedColumnWidth(38),
+            6: const pw.FlexColumnWidth(2),
+          },
           headers: ['क्र.', 'नोंदणी', 'नाव', 'पत्ता', 'मोबाईल', 'वय', 'शेरा'],
           data: members
               .map((m) => [

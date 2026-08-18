@@ -31,12 +31,12 @@ class HomeScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
       children: [
-        const Text('|| ज्येष्ठ आम्ही ज्येष्ठच राहू ||',
-            style: TextStyle(color: AppColors.marigold, fontWeight: FontWeight.w600, fontSize: 13)),
-        const SizedBox(height: 2),
-        const Text('नमस्कार, कार्यालय 🙏',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.ink)),
-        const SizedBox(height: 12),
+        const Center(
+          child: Text('|| ज्येष्ठ आम्ही ज्येष्ठच राहू ||',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.marigold, fontWeight: FontWeight.w800, fontSize: 22)),
+        ),
+        const SizedBox(height: 14),
         Row(children: [
           _stat('एकूण सभासद', '$total', AppColors.green),
           const SizedBox(width: 12),

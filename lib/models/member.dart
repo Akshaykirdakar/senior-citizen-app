@@ -63,7 +63,7 @@ class Member {
     final p = deathDate.split('-');
     return p.length == 3 ? '${p[2]}/${p[1]}/${p[0]}' : deathDate;
   }
-  String get statusRemark => deceased ? ('मयत ' + deathDateFmt).trim() : 'हयात';
+  String get statusRemark => deceased ? ('मयत ' + deathDateFmt).trim() : '';
 
   String get fullAddress {
     final parts = <String>[];
